@@ -6,7 +6,7 @@ import { FaBackward, FaForward } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { setColor } from "../redux/Slice/bgReducer";
 import { MdFavorite,MdFavoriteBorder  } from "react-icons/md";
-import { toggleFavorite } from "../redux/Slice/trackReducer";
+
 
 const Player = () => {
   const dispatch = useDispatch();
@@ -17,6 +17,7 @@ const Player = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showOptions, setShowOptions] = useState(false);
+  const [isFavourite, setIsFavourite] = useState(false);
 
   const togglePlay = () => {
     if (audioRef.current) {
@@ -72,11 +73,30 @@ const Player = () => {
   };
 
 
-  const handleFavorite = () => {
-    dispatch(toggleFavorite());
-    setShowOptions(false); 
+  const toggleFavourite = (track) => {
+    setShowOptions(false);
+    const stored = JSON.parse(localStorage.getItem("favourites")) || [];
+    const exists = stored.find((t) => t.id === track.id);
+    
+    let updated;
+    if (exists) {
+      updated = stored.filter((t) => t.id !== track.id);
+      setIsFavourite(false);
+    } else {
+      updated = [...stored, track];
+      setIsFavourite(true);
+    }
+  
+    localStorage.setItem("favourites", JSON.stringify(updated));
+    
   };
 
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem("favourites")) || [];
+    const fav = stored.some((t) => t.id === song.id);
+    setIsFavourite(fav);
+  }, [song]);
+  
   useEffect(() => {
     const img = new Image();
     img.crossOrigin = "Anonymous";
@@ -138,10 +158,10 @@ const Player = () => {
           {showOptions && (
             <div className="absolute bottom-12 left-0 mb-2   rounded-full  w-15 p-2">
               <button
-                onClick={handleFavorite}
+                onClick={() => toggleFavourite(song)}
                 className="w-full text-left p-2 "
               >
-                {song.favorite ? <MdFavorite color="red" size={20} /> : <MdFavoriteBorder size={20} /> }
+                {isFavourite ? <MdFavorite color="red" size={20} /> : <MdFavoriteBorder size={20} /> }
               </button>
             </div>
           )}

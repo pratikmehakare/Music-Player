@@ -18,12 +18,12 @@ const trackSlice = createSlice({
     setSong(state, value) {
       state.song = value.payload
     },
-    toggleFavorite: (state) => {
-      state.song = { ...state.song, favorite: !state.song.favorite };
-    },
+    // toggleFavorite: (state) => {
+    //   state.song = { ...state.song, favorite: !state.song.favorite };
+    // },
   },
 })
 
-export const { setSong,toggleFavorite } = trackSlice.actions
+export const { setSong } = trackSlice.actions
 
 export default trackSlice.reducer

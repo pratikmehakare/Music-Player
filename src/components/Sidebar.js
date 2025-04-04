@@ -6,18 +6,48 @@ import { setSong } from "../redux/Slice/trackReducer";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
-  const [searchTerm, setSearchTerm] = useState(""); 
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     if (songs.length > 0) {
-      dispatch(setSong(songs[0])); 
+      dispatch(setSong(songs[0]));
     }
   }, [dispatch]);
 
+  const incrementPlayCount = (track) => {
+    const stored = JSON.parse(localStorage.getItem("playCounts")) || {};
+    
+    if (stored[track.id]) {
+      stored[track.id].count += 1;
+    } else {
+      stored[track.id] = {
+        ...track,
+        count: 1,
+      };
+    }
+  
+    localStorage.setItem("playCounts", JSON.stringify(stored));
+  };
+
+
+  const setRecentlyPlayed = (track) => {
+    if (!track || !track.id) return; 
+  
+    const stored = JSON.parse(sessionStorage.getItem("recentlyPlayed")) || [];
+  
+    const filtered = stored.filter((t) => t.id !== track.id); 
+  
+    const updated = [track, ...filtered].slice(0, 10); 
+  
+    sessionStorage.setItem("recentlyPlayed", JSON.stringify(updated));
+  };
+  
 
   const filteredSongs = songs.filter((track) =>
-    track.title.toLowerCase().includes(searchTerm.toLowerCase())
+    track.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    track.artist.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  
 
   return (
     <div>
@@ -40,7 +70,11 @@ const Sidebar = () => {
         {filteredSongs.map((track, index) => (
           <li
             key={index}
-            onClick={() => dispatch(setSong(track))}
+            onClick={() => {
+              dispatch(setSong(track));
+              incrementPlayCount(track);
+              setRecentlyPlayed(track);
+            }}
             className="flex mt-2 items-center justify-between p-2 rounded-lg hover:bg-gray-800 cursor-pointer"
           >
             <div className="flex items-center gap-3">

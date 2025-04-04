@@ -1,13 +1,18 @@
 import React from "react";
 import Player from "../components/Player";
 import Sidebar from "../components/Sidebar";
+import FavSidebar from "../components/FavSidebar";
 import Navigation from "../components/Navigation";
 import Profile from "../assets/Profile.png";
 import logo from "../assets/logo.png";
 import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import TopSidebar from "../components/TopSidebar";
+import RecentSidebar from "../components/RecentSidebar";
 
 const Dashboard = () => {
   const { color } = useSelector((state) => state.bgcolor);
+  const location = useLocation();
 
   return (
     <div
@@ -36,7 +41,7 @@ const Dashboard = () => {
         </div>
 
         <div
-          className="absolute rounded-full" 
+          className="absolute rounded-full"
           style={{
             width: "48px",
             height: "48px",
@@ -53,9 +58,20 @@ const Dashboard = () => {
       </div>
 
       {/* Sidebar */}
-      <div className=" hidden sm:block absolute text-white p-4 w-[440px] h-full top-[25px] left-[278px] overflow-y-auto">
-        <Sidebar />
+      <div className="hidden sm:block absolute text-white p-4 w-[440px] h-full top-[25px] left-[278px]">
+        {(() => {
+          if (location.pathname === "/favourites") {
+            return <FavSidebar />;
+          } else if (location.pathname === "/top-tracks") {
+            return <TopSidebar />;
+          } else if (location.pathname === "/recently-played") {
+            return <RecentSidebar />;
+          } else {
+            return <Sidebar />;
+          }
+        })()}
       </div>
+
       {/* Player */}
       <div className="hidden sm:block absolute text-white p-4 w-[510px] h-[708.24px] top-[78px] left-[860px] flex flex-col gap-[40px]">
         <Player />
